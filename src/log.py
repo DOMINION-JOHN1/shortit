@@ -9,7 +9,7 @@ import os
 def setup_logger(app):
 
     """ The function  implements improvements on flask's default logger.
-    its sets the logging level,specifiesthe format of log
+    its sets the logging level,specifies the format of log
     the log messages,ensures that log file size don't
      exceed 10kb and stores upto 10 log files  """
 
