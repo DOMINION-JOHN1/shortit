@@ -61,4 +61,4 @@ jobs:
         pip install -r requirements.txt
     - name: Check import statements  # Verify that required packages can be imported
       run: |
-        python -c "import flask; import pymongo; iprint('All required packages are installed.')"
+        python -c "import flask; import pymongo; print('All required packages are installed.')"
