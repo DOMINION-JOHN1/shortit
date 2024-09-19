@@ -1,0 +1,64 @@
+# Name of the GitHub Actions workflow
+name: ShortIt CI Pipeline
+
+# Define when this workflow will run
+on:
+  push:
+    branches: [ main, shortit ]  # Trigger on pushes to main and shortit branches
+  pull_request:
+    branches: [ main, shortit ]  # Trigger on pull requests to main and shortit branches
+
+# Define the jobs that will run as part of this workflow
+jobs:
+  # Job for linting the code
+  lint:
+    runs-on: ubuntu-latest  # Use the latest version of Ubuntu
+    steps:
+    - uses: actions/checkout@v2  # Check out the repository code
+    - name: Set up Python  # Set up Python environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'  # Use Python 3.10
+    - name: Install dependencies  # Install required packages
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pylint
+    - name: Lint with pylint  # Running pylint on all Python files
+      run: |
+        pylint **/*.py
+
+  # Job for security checks
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install bandit
+    - name: Run security checks with bandit  # Using bandit for security analysis
+      run: |
+        bandit -r . -f custom
+
+  # Job for checking package imports
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Check import statements  # Verify that required packages can be imported
+      run: |
+        python -c "import flask; import pymongo; print('All required packages are installed.')"
