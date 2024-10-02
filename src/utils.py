@@ -1,31 +1,31 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from pymongo import MongoClient
-from bson import ObjectId
+from pymongo.collection import ObjectId
 import string
 import random
-import os
-from dotenv import load_dotenv
 from datetime import datetime
 
 
-# Load all environment variable
-load_dotenv()
-
 # MongoDB connection  and initialization
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
+MONGO_URI = 'mongodb://localhost:27017/'
 client = MongoClient(MONGO_URI)
 
+
+ObjectId = ObjectId()
 # Creation of the database and collection
 db = client['shortit_db']
 urls_collection = db['urls']
 
 # Accessing the environment variables
-BASE_URL = os.getenv('BASE_URL', 'https://shortit/')
+BASE_URL = 'https://shortit/'
+
 
 def generate_short_url():
     """Generate a random 6-character string for short URL"""
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(6))
+
+
 def get_all_urls():
     """Retrieve all URLs from the database"""
     try:
@@ -43,27 +43,25 @@ def get_all_urls():
         return jsonify({'error': str(e)}), 500
 
 
-def get_one_url(url_identifier):
-    """Retrieve a single URL by its short URL or original URL"""
+def get_one_url(url_id):
+    """Retrieve a single URL by its ID"""
     try:
-        # Try to find the URL by short URL first
-        url=urls_collection.find_one({'shortUrl': url_identifier})
-
-        # If not found, try to find by original URL
-        if not url:
-            url=urls_collection.find_one({'originalUrl': url_identifier})
+        # Find the URL by its ID
+        url = urls_collection.find_one({'_id': ObjectId(url_id)})
 
         if url:
-            formatted_url={
+            formatted_url = {
                 'id': str(url['_id']),
                 'originalUrl': url['originalUrl'],
                 'shortUrl': f"{BASE_URL}{url['shortUrl']}",
                 'createdAt': url['createdAt'].isoformat()
             }
             return jsonify(formatted_url), 200
-        return jsonify({'error': 'URL not found'}), 404
+        else:
+            return jsonify({'error': 'URL not found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 def create_short_url():
     """Create a new short url when a long url is posted by the user """
