@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 # MongoDB connection  and initialization
-MONGO_URI = 'mongodb://localhost:27017/'
+MONGO_URI = "mongodb://db:27017"
 client = MongoClient(MONGO_URI)
 
 
