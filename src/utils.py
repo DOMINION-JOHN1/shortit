@@ -1,17 +1,19 @@
-from flask import Flask, request, jsonify
-from pymongo import MongoClient
-from pymongo.collection import ObjectId
+"""This module contains all the functions for the execution of the shortit app"""
+
 import string
 import random
+from flask import request, jsonify
+from pymongo import MongoClient
+# from pymongo.collection import ObjectId
 from datetime import datetime
 
-app = Flask(__name__)
+
 # MongoDB connection  and initialization
 MONGO_URI = 'mongodb://localhost:27017/'
 client = MongoClient(MONGO_URI)
 
 
-ObjectId = ObjectId()
+# ObjectId = ObjectId()
 # Creation of the database and collection
 db = client['shortit_db']
 urls_collection = db['urls']
@@ -25,7 +27,7 @@ def generate_short_url():
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(6))
 
-@app.route('/get_all_urls', methods=['GET'])
+
 def get_all_urls():
     """Retrieve all URLs from the database"""
     try:
@@ -42,12 +44,12 @@ def get_all_urls():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/urls/<string:url_id>', methods=['GET'])
+
 def get_one_url(url_id):
     """Retrieve a single URL by its ID"""
     try:
         # Find the URL by its ID
-        url = urls_collection.find_one({'_id': ObjectId(url_id)})
+        url = urls_collection.find_one({'_id': str(url_id)})
 
         if url:
             formatted_url = {
@@ -63,7 +65,6 @@ def get_one_url(url_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/urls', methods=['POST'])
 def create_short_url():
     """Create a new short url when a long url is posted by the user """
     try:
@@ -118,7 +119,3 @@ def create_short_url():
     except Exception as e:
         # Handle exceptions and return a JSON response with an error message and a 500 status code
         return jsonify({'error': str(e)}), 500
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
